@@ -1,4 +1,4 @@
-__version__ = '0.9.0'
+__version__ = '0.9.1'
 
 import argparse
 import json
@@ -204,6 +204,12 @@ def main():
     parser_strip_titles.add_argument('-s', '--strip-titles', action='store_true',
                                      help='Strip quotes and extra spaces from .feature titles')
 
+    parser_exit_on_empty_files = argparse.ArgumentParser(add_help=False)
+    parser_exit_on_empty_files.add_argument(
+        '-e', '--exit-on-empty-files', action='store_true',
+        help='Exit if it\'s impossible to parse .feature file (i.e. it\'s empty)'
+    )
+
     parser_project_code = argparse.ArgumentParser(add_help=False)
     parser_project_code.add_argument(
         '-c', '--project-code', metavar='<code>', type=str,
@@ -227,7 +233,7 @@ def main():
 
     parser_render_local = subparsers.add_parser(
         'render-local',
-        parents=[parser_path, parser_attr, parser_strip_titles]
+        parents=[parser_path, parser_attr, parser_strip_titles, parser_exit_on_empty_files]
     )
     parser_render_local.set_defaults(func=render_local_tree)
 
@@ -245,7 +251,8 @@ def main():
                  parser_project_code,
                  parser_custom_fields_path,
                  parser_dry_run,
-                 parser_strip_titles]
+                 parser_strip_titles,
+                 parser_exit_on_empty_files]
     )
     parser_push.set_defaults(func=push)
 
@@ -256,7 +263,8 @@ def main():
                  parser_project_code,
                  parser_root_suite_id,
                  parser_attr,
-                 parser_strip_titles]
+                 parser_strip_titles,
+                 parser_exit_on_empty_files]
     )
     parser_render_flat_diff.set_defaults(func=render_flat_diff)
 
@@ -267,7 +275,8 @@ def main():
                  parser_project_code,
                  parser_root_suite_id,
                  parser_attr,
-                 parser_strip_titles]
+                 parser_strip_titles,
+                 parser_exit_on_empty_files]
     )
     parser_render_diff.set_defaults(func=render_diff)
 
@@ -304,6 +313,9 @@ def main():
         config.QASE_CUSTOM_FIELD_DEFAULTS = parse_custom_fields_file(args.custom_fields_path)
 
     config.STRIP_TITLES = getattr(args, 'strip_titles', config.STRIP_TITLES)
+
+    exit_on_empty_files = getattr(args, 'exit_on_empty_files', False)
+    config.SKIP_EMPTY_FILES = not exit_on_empty_files
 
     logging.basicConfig(level=args.loglevel)
     args.func(args)

@@ -1,7 +1,13 @@
+import logging
+
 from gherkin.parser import Parser
 from tabulate import tabulate
 
+from . import config
 from .tree import Entity, LocalCaseNode
+
+
+logger = logging.getLogger(__name__)
 
 
 def parse_gherkin_document(path):
@@ -9,10 +15,18 @@ def parse_gherkin_document(path):
     return parser.parse(str(path))
 
 
-def iterate_scenarios(document):
-    feature = document['feature']
+def iterate_scenarios(path, document):
+    feature = document.get('feature', None)
+    if not feature:
+        msg = f'Couldn\'t parse file {str(path)}'
+        if config.SKIP_EMPTY_FILES:
+            logger.warning(msg)
+            return
+        else:
+            raise ValueError(f'Couldn\'t parse file {str(path)}')
+
     background = None
-    for child in feature['children']:
+    for child in feature.get('children', []):
         if 'background' in child.keys():
             background = child['background']
         if 'scenario' in child.keys():
@@ -21,7 +35,7 @@ def iterate_scenarios(document):
 
 def gherkin_as_nodes(path, parent):
     document = parse_gherkin_document(path)
-    for scenario, background in iterate_scenarios(document):
+    for scenario, background in iterate_scenarios(path, document):
         yield gherkin_scenario_as_node(scenario, background, path, parent)
 
 

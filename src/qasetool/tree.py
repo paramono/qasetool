@@ -50,7 +50,7 @@ class Entity(Enum):
 
 @unique
 class Action(Enum):
-    NONE   = 'None'
+    NONE   = '-None-'
     CREATE = 'Create'
     UPDATE = 'Update'
     DELETE = 'Delete'
@@ -63,9 +63,11 @@ class Action(Enum):
             return Color.OKCYAN
         elif self == Action.DELETE:
             return Color.FAIL
+        elif self == Action.NONE:
+            return Color.BOLD
         return ''
 
-    def render(self, string: str = '', ignore_none: bool = True) -> str:
+    def render(self, string: str = '', ignore_none: bool = False) -> str:
         if self == Action.NONE and ignore_none:
             return ''
 

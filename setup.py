@@ -14,7 +14,7 @@ readme = ''
 setup(
     long_description=readme,
     name='qasetool',
-    version='0.9.0',
+    version='0.9.1',
     python_requires='==3.*,>=3.8.0',
     author='paramono',
     author_email='alex@paramono.com',
