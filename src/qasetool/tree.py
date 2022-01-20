@@ -352,7 +352,7 @@ class Tree:
             suite = config.qase.suites.update(
                 config.QASE_PROJECT_CODE,
                 node.pk,
-                TestSuiteUpdate(node.name, parent_id=node.parent.pk)
+                TestSuiteUpdate(title=node.name, parent_id=node.parent.pk)
             )
             node.pk = suite.id
         elif node.action == Action.DELETE:
